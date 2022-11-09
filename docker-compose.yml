@@ -22,3 +22,19 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 2
+
+  pulsar:
+    image: apachepulsar/pulsar:2.9.2
+    container_name: pulsar
+    ports:
+      - "8080:8080"
+      - "6650:6650"
+    environment:
+      PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"
+      systemTopicEnabled: "true"
+      topicLevelPoliciesEnabled: "true"
+      transactionCoordinatorEnabled: "true"
+    command: >
+      /bin/bash -c
+      " bin/apply-config-from-env.py conf/standalone.conf
+      && bin/pulsar standalone"
