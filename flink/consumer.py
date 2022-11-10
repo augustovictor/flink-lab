@@ -22,8 +22,8 @@ if __name__ == "__main__":
     env = StreamExecutionEnvironment.get_execution_environment()
     print(env)
     env.set_parallelism(1)
-    env.add_jars("file:///home/flink-jars/flink-connector-pulsar-1.16.0.jar")
-    env.add_jars("file:///home/flink-jars/flink-sql-connector-pulsar-1.15.1.1.jar")
+    # env.add_jars("file:///home/flink-jars/flink-connector-pulsar-1.16.0.jar")
+    env.add_jars("file:///home/flink-jars/flink-sql-connector-pulsar-1.15.1.2.jar")
 
     # schema = AvroSchema(User)
     # TODO: Specify User's avro schema
