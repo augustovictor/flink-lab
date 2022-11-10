@@ -11,7 +11,7 @@ from pyflink.datastream.connectors.pulsar import (
     DeliveryGuarantee,
     TopicRoutingMode,
 )
-
+# from pyflink.table.udf import udtf
 
 if __name__ == "__main__":
     topic = "my-topic"
@@ -22,9 +22,11 @@ if __name__ == "__main__":
     env = StreamExecutionEnvironment.get_execution_environment()
     print(env)
     env.set_parallelism(1)
-    env.add_jars("file:///home/pyflink/flink-connector-pulsar-1.16.0.jar")
-    env.add_jars("file:///home/pyflink/flink-sql-connector-pulsar-1.15.1.1.jar")
+    env.add_jars("file:///home/flink-jars/flink-connector-pulsar-1.16.0.jar")
+    env.add_jars("file:///home/flink-jars/flink-sql-connector-pulsar-1.15.1.1.jar")
 
+    # schema = AvroSchema(User)
+    # TODO: Specify User's avro schema
     pulsar_source = (
         PulsarSource.builder()
         .set_service_url(pulsar_service_url)
@@ -42,28 +44,35 @@ if __name__ == "__main__":
         .build()
     )
 
+    def append_str(data):
+        data += " [MODIFIED BY FLINK]"
+        return data
+
     ds = env.from_source(
         source=pulsar_source,
         watermark_strategy=WatermarkStrategy.for_monotonous_timestamps(),
         source_name="pulsar source",
     )
+    ds.map(append_str).print().name("print")
     # Should be created before usage. it was created in Makefile
-    destination_topic = "results"
-    pulsar_sink = (
-        PulsarSink.builder()
-        .set_service_url(pulsar_service_url)
-        .set_admin_url(pulsar_admin_url)
-        .set_producer_name("pyflink_producer")
-        .set_topics(destination_topic)
-        .set_serialization_schema(
-            PulsarSerializationSchema.flink_schema(SimpleStringSchema())
-        )
-        .set_delivery_guarantee(DeliveryGuarantee.AT_LEAST_ONCE)
-        .set_topic_routing_mode(TopicRoutingMode.ROUND_ROBIN)
-        .set_config("pulsar.producer.maxPendingMessages", 1000)
-        .set_properties({"pulsar.producer.batchingMaxMessages": "100"})
-        .build()
-    )
+    # destination_topic = "results"
+    # pulsar_sink = (
+    #     PulsarSink.builder()
+    #     .set_service_url(pulsar_service_url)
+    #     .set_admin_url(pulsar_admin_url)
+    #     .set_producer_name("pyflink_producer")
+    #     .set_topics(destination_topic)
+    #     .set_serialization_schema(
+    #         PulsarSerializationSchema.flink_schema(SimpleStringSchema())
+    #     )
+    #     .set_delivery_guarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+    #     .set_topic_routing_mode(TopicRoutingMode.ROUND_ROBIN)
+    #     # .set_config("pulsar.producer.maxPendingMessages", 1000)
+    #     # .set_properties({"pulsar.producer.batchingMaxMessages": "100"})
+    #     .set_config("pulsar.source.enableAutoAcknowledgeMessage", True)
+    #     .build()
+    # )
 
-    ds.sink_to(pulsar_sink).name("pulsar sink")
-    env.execute()
+    # ds.sink_to(pulsar_sink).name("pulsar sink")
+    env.execute("Sample messages processing")
+

@@ -1,9 +1,12 @@
 version: "2.2"
 services:
   jobmanager:
-    image: pyflink:1.16.0
+    # image: pyflink:1.16.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
-    - ./:/home/pyflink
+      - ./:/home/pyflink
     ports:
       - "8085:8081"
     command: jobmanager
@@ -12,7 +15,10 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
   taskmanager:
-    image: pyflink:1.16.0
+    # image: pyflink:1.16.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - jobmanager
     command: taskmanager
