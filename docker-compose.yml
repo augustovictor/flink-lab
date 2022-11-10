@@ -44,3 +44,24 @@ services:
       /bin/bash -c
       " bin/apply-config-from-env.py conf/standalone.conf
       && bin/pulsar standalone"
+
+  pulsar-topics-setup:
+    image: alpine
+    container_name: pulsar-topics-setup
+    build:
+      context: .
+      dockerfile: Dockerfile.pulsar-setup
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    # stdin_open: true # docker run -i
+    # tty: true # docker run -t
+    #
+    depends_on:
+      - pulsar
+    command: >
+      sh -c "
+      docker exec pulsar bin/pulsar-admin topics create-partitioned-topic -p 1 persistent://public/default/my-topic && \
+      docker exec pulsar bin/pulsar-admin topics set-retention -s -1 -t -1 persistent://public/default/my-topic && \
+      docker exec pulsar bin/pulsar-admin topics create-partitioned-topic -p 1 persistent://public/default/results && \
+      docker exec pulsar bin/pulsar-admin topics set-retention -s -1 -t -1 persistent://public/default/results
+      "
