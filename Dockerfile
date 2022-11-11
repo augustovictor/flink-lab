@@ -24,7 +24,8 @@ RUN pip3 install apache-flink==1.16.0 apache-flink-libraries==1.16.0
 
 # Apache
 RUN wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-pulsar/1.16.0/flink-connector-pulsar-1.16.0.jar -P /home/flink-jars/
-RUN wget https://repo1.maven.org/maven2/org/apache/flink/flink-avro/1.16.0/flink-avro-1.16.0.jar -P /home/flink-jars/
+# Didn't need this one
+# RUN wget https://repo1.maven.org/maven2/org/apache/flink/flink-avro/1.16.0/flink-avro-1.16.0.jar -P /home/flink-jars/
 RUN wget https://repo1.maven.org/maven2/org/apache/flink/flink-sql-avro/1.16.0/flink-sql-avro-1.16.0.jar -P /home/flink-jars/
 RUN wget https://repo1.maven.org/maven2/io/streamnative/connectors/flink-sql-connector-pulsar/1.15.1.1/flink-sql-connector-pulsar-1.15.1.1.jar -P /home/flink-jars/
 # Stream native

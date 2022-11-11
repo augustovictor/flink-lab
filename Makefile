@@ -39,7 +39,7 @@ flink-submit-job:
 	# https://mvnrepository.com/artifact/org.apache.flink/flink-connector-pulsar/1.16.0
 	# https://streamnative.io/blog/release/2022-09-29-announcing-the-flink-pulsar-sql-connector/
 	# https://repo1.maven.org/maven2/io/streamnative/connectors/flink-sql-connector-pulsar/1.15.1.1/
-	docker exec flink-lab-jobmanager-1 ./bin/flink run -py /home/pyflink/flink/consumer.py -pyexec /usr/local/bin/python -pyclientexec /usr/local/bin/python  #--jarfile /home/flink-jars/flink-connector-pulsar-1.15.1.2.jar
+	docker exec flink-lab-jobmanager-1 ./bin/flink run -py /home/pyflink/flink/consumer.py -pyexec /usr/local/bin/python -pyclientexec /usr/local/bin/python
 
 flink-ls-jobmanager-pyflink-folder:
 	docker exec flink-lab-jobmanager-1 ls /home/flink-jars

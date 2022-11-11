@@ -1,5 +1,6 @@
 from pyflink.common import SimpleStringSchema, WatermarkStrategy
-from pyflink.common.serialization import AvroRowDeserializationSchema
+
+# from pyflink.common.serialization import AvroRowDeserializationSchema
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.datastream.connectors.pulsar import (
     PulsarSource,
@@ -13,7 +14,7 @@ from pyflink.datastream.connectors.pulsar import (
     TopicRoutingMode,
 )
 
-from pyflink.datastream.formats.avro import AvroSchema
+from pyflink.datastream.formats.avro import AvroSchema, AvroRowDeserializationSchema
 
 # SimpleStringSchema()
 
@@ -35,22 +36,21 @@ if __name__ == "__main__":
     env.add_jars(
         "file:///home/flink-jars/flink-connector-pulsar-1.16.0.jar",
         "file:///home/flink-jars/flink-sql-connector-pulsar-1.15.1.1.jar",
-        "file:///home/flink-jars/flink-avro-1.16.0.jar",
+        # "file:///home/flink-jars/flink-avro-1.16.0.jar",
         "file:///home/flink-jars/flink-sql-avro-1.16.0.jar",
     )
 
     USER_SCHEMA = """
     {
-        "type": "record",
-        "name": "user",
-        "fields": [
-            { "name": "id", "type": "int" },
-            { "name": "name", "type": "string" },
-            { "name": "last_name", "type": "string" }
+        "type" : "record",
+        "name" : "User",
+        "fields" : [
+            {"name" : "id", "type" : ["null", "int" ]},
+            {"name" : "name", "type" : ["null", "string"]},
+            {"name" : "last_name", "type" : ["null", "string"]}
         ]
     }
     """
-    schema = AvroSchema.parse_string(USER_SCHEMA)
 
     # schema = AvroSchema(User)
     pulsar_source = (
@@ -62,23 +62,29 @@ if __name__ == "__main__":
         .set_unbounded_stop_cursor(StopCursor.never())
         .set_subscription_name("pyflink_subscription")
         .set_subscription_type(SubscriptionType.Exclusive)
-        #https://nightlies.apache.org/flink/flink-docs-master/docs/connectors/datastream/pulsar/#deserializer
-        .set_deserialization_schema(PulsarDeserializationSchema.flink_schema(AvroRowDeserializationSchema(avro_schema_string=USER_SCHEMA)))
+        # https://nightlies.apache.org/flink/flink-docs-master/docs/connectors/datastream/pulsar/#deserializer
+        .set_deserialization_schema(
+            PulsarDeserializationSchema.flink_schema(
+                AvroRowDeserializationSchema(avro_schema_string=USER_SCHEMA)
+            )
+        )
+        # .set_deserialization_schema(PulsarDeserializationSchema.flink_schema(SimpleStringSchema()))
         .set_config("pulsar.source.enableAutoAcknowledgeMessage", True)
-        .set_config("rest.flamegraph.enabled", True)
+        # .set_config("rest.flamegraph.enabled", True)
         .build()
     )
 
-    def append_str(data):
-        data += " [MODIFIED BY FLINK]"
-        return data
+    # def append_str(data):
+    #     data += " [MODIFIED BY FLINK]"
+    #     return data
 
     ds = env.from_source(
         source=pulsar_source,
         watermark_strategy=WatermarkStrategy.for_monotonous_timestamps(),
         source_name="pulsar source",
     )
-    ds.map(append_str).print().name("print")
+    # ds.map(append_str).print().name("print")
+    ds.print().name("print")
     # Should be created before usage. it was created in Makefile
     # destination_topic = "results"
     # pulsar_sink = (
