@@ -35,17 +35,14 @@ flink-start-container:
 	docker-compose up jobmanager taskmanager
 
 flink-submit-job:
-	docker exec flink-lab-jobmanager-1 ./bin/flink run -py /home/pyflink/main.py -pyexec /usr/local/bin/python -pyclientexec /usr/local/bin/python # -pyreq file:///home/pyflink/requirements.txt
-
-flink-submit-job:
 
 	# https://mvnrepository.com/artifact/org.apache.flink/flink-connector-pulsar/1.16.0
 	# https://streamnative.io/blog/release/2022-09-29-announcing-the-flink-pulsar-sql-connector/
 	# https://repo1.maven.org/maven2/io/streamnative/connectors/flink-sql-connector-pulsar/1.15.1.1/
-	docker exec flink-lab-jobmanager-1 ./bin/flink run -py /home/pyflink/flink/consumer.py -pyexec /usr/local/bin/python -pyclientexec /usr/local/bin/python #--pyfiles file:///home/pyflink/flink-connector-pulsar-1.16.0.jar --jarfile file:///home/pyflink/flink-connector-pulsar-1.16.0.jar
+	docker exec flink-lab-jobmanager-1 ./bin/flink run -py /home/pyflink/flink/consumer.py -pyexec /usr/local/bin/python -pyclientexec /usr/local/bin/python  #--jarfile /home/flink-jars/flink-connector-pulsar-1.15.1.2.jar
 
 flink-ls-jobmanager-pyflink-folder:
-	docker exec flink-lab-jobmanager-1 ls /home/pyflink
+	docker exec flink-lab-jobmanager-1 ls /home/flink-jars
 
 pulsar-list-topics:
 	docker exec pulsar bin/pulsar-admin topics list public/default

@@ -1,4 +1,5 @@
 from pyflink.common import SimpleStringSchema, WatermarkStrategy
+from pyflink.common.serialization import AvroRowDeserializationSchema
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.datastream.connectors.pulsar import (
     PulsarSource,
@@ -11,22 +12,47 @@ from pyflink.datastream.connectors.pulsar import (
     DeliveryGuarantee,
     TopicRoutingMode,
 )
-# from pyflink.table.udf import udtf
+
+from pyflink.datastream.formats.avro import AvroSchema
+
+# SimpleStringSchema()
+
+
+# class User(DeserializationSchema):
+#     def __init__(self, id, name, last_name):
+#         self.id = id
+#         self.name = name
+#         self.last_name = last_name
+
 
 if __name__ == "__main__":
     topic = "my-topic"
     pulsar_service_url = "pulsar://pulsar:6650"
     pulsar_admin_url = "http://pulsar:8080"
-    print("INITIAL...")
 
     env = StreamExecutionEnvironment.get_execution_environment()
-    print(env)
     env.set_parallelism(1)
-    # env.add_jars("file:///home/flink-jars/flink-connector-pulsar-1.16.0.jar")
-    env.add_jars("file:///home/flink-jars/flink-sql-connector-pulsar-1.15.1.2.jar")
+    env.add_jars(
+        "file:///home/flink-jars/flink-connector-pulsar-1.16.0.jar",
+        "file:///home/flink-jars/flink-sql-connector-pulsar-1.15.1.1.jar",
+        "file:///home/flink-jars/flink-avro-1.16.0.jar",
+        "file:///home/flink-jars/flink-sql-avro-1.16.0.jar",
+    )
+
+    USER_SCHEMA = """
+    {
+        "type": "record",
+        "name": "user",
+        "fields": [
+            { "name": "id", "type": "int" },
+            { "name": "name", "type": "string" },
+            { "name": "last_name", "type": "string" }
+        ]
+    }
+    """
+    schema = AvroSchema.parse_string(USER_SCHEMA)
 
     # schema = AvroSchema(User)
-    # TODO: Specify User's avro schema
     pulsar_source = (
         PulsarSource.builder()
         .set_service_url(pulsar_service_url)
@@ -36,9 +62,8 @@ if __name__ == "__main__":
         .set_unbounded_stop_cursor(StopCursor.never())
         .set_subscription_name("pyflink_subscription")
         .set_subscription_type(SubscriptionType.Exclusive)
-        .set_deserialization_schema(
-            PulsarDeserializationSchema.flink_schema(SimpleStringSchema())
-        )
+        #https://nightlies.apache.org/flink/flink-docs-master/docs/connectors/datastream/pulsar/#deserializer
+        .set_deserialization_schema(PulsarDeserializationSchema.flink_schema(AvroRowDeserializationSchema(avro_schema_string=USER_SCHEMA)))
         .set_config("pulsar.source.enableAutoAcknowledgeMessage", True)
         .set_config("rest.flamegraph.enabled", True)
         .build()
@@ -75,4 +100,3 @@ if __name__ == "__main__":
 
     # ds.sink_to(pulsar_sink).name("pulsar sink")
     env.execute("Sample messages processing")
-

@@ -1,4 +1,4 @@
-version: "2.2"
+version: "3.9"
 services:
   jobmanager:
     # image: pyflink:1.16.0
@@ -58,6 +58,7 @@ services:
     #
     depends_on:
       - pulsar
+    restart: on-failure
     command: >
       sh -c "
       docker exec pulsar bin/pulsar-admin topics create-partitioned-topic -p 1 persistent://public/default/my-topic && \
