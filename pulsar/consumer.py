@@ -2,24 +2,29 @@ import pulsar
 
 
 client = pulsar.Client("pulsar://localhost:6650")
-# topic_to_listen_to = "results" # Results from flink
-topic_to_listen_to = "my-topic" # From pulsar
+topic_to_listen_to = "results" # Results from flink
+# topic_to_listen_to = "my-topic" # From pulsar
 
-
+# https://pulsar.apache.org/docs/client-libraries-python/
 class User(pulsar.schema.Record):
     id = pulsar.schema.Integer()
     name = pulsar.schema.String()
     last_name = pulsar.schema.String()
 
 
-# Avro consumer
 consumer = client.subscribe(
     topic=topic_to_listen_to,
     schema=pulsar.schema.schema_avro.AvroSchema(User),
-    subscription_name="my-sub",
+    subscription_name="my-pulsar-sub",
 )
-msg = consumer.receive()
-print(msg.value())
+# Avro consumer
+try:
+    while True:
+        msg = consumer.receive()
+        print(msg.value())
+except KeyboardInterrupt:
+    print("interrupted...")
+    client.close()
 
 # Plain text consumer
 # consumer = client.subscribe(topic_to_listen_to,

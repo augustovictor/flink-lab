@@ -1,6 +1,6 @@
 from time import sleep
 import pulsar
-
+# https://pulsar.apache.org/docs/client-libraries-python/
 class User(pulsar.schema.Record):
     id = pulsar.schema.Integer()
     name = pulsar.schema.String()
@@ -9,8 +9,8 @@ class User(pulsar.schema.Record):
 client = pulsar.Client('pulsar://localhost:6650')
 producer = client.create_producer('my-topic', schema=pulsar.schema.schema_avro.AvroSchema(User))
 
-for i in range(100):
-    user = User(id=i, name=f"FirstName{i}", last_name=f"LastName{i}")
+for i in range(1):
+    user = User(id=i, name=f"FirstName Flinker{i}", last_name=f"LastName{i}")
     producer.send(content=user)
     print(user)
     sleep(2)
