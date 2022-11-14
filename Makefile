@@ -39,7 +39,7 @@ flink-submit-job:
 	# https://mvnrepository.com/artifact/org.apache.flink/flink-connector-pulsar/1.16.0
 	# https://streamnative.io/blog/release/2022-09-29-announcing-the-flink-pulsar-sql-connector/
 	# https://repo1.maven.org/maven2/io/streamnative/connectors/flink-sql-connector-pulsar/1.15.1.1/
-	docker exec flink-lab-jobmanager-1 ./bin/flink run -py /home/pyflink/flink/consumer.py -pyexec /usr/local/bin/python -pyclientexec /usr/local/bin/python
+	docker exec flink-lab-jobmanager-1 ./bin/flink run -py /home/pyflink/flink/consumer.py #-pyexec /usr/local/bin/python -pyclientexec /usr/local/bin/python #-pyFiles /Users/victor.costa/IdeaProjects/personal/flink-lab/flink/EnrichedUser.avsc
 
 flink-ls-jobmanager-pyflink-folder:
 	docker exec flink-lab-jobmanager-1 ls /home/flink-jars
@@ -53,4 +53,6 @@ pulsar-produce-messages:
 pulsar-consume-messages:
 	poetry run python pulsar/consumer.py
 
+pulsar-print-results-topic-schema:
+	docker exec pulsar bin/pulsar-admin schemas get persistent://public/default/results
 

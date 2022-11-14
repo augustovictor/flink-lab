@@ -14,5 +14,6 @@
 
 # Schema
 - (Schema evolution and compatibility)[https://pulsar.apache.org/docs/schema-evolution-compatibility]
+- (User Defined DataTypes not supported for python)[https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/types/#user-defined-data-types]
 
 https://search.maven.org/search?q=a:flink-connector-pulsar

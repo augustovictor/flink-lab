@@ -11,10 +11,14 @@ class User(pulsar.schema.Record):
     name = pulsar.schema.String()
     last_name = pulsar.schema.String()
 
+class UserEnriched(pulsar.schema.Record):
+    id = pulsar.schema.Integer()
+    full_name = pulsar.schema.String()
+
 
 consumer = client.subscribe(
     topic=topic_to_listen_to,
-    schema=pulsar.schema.schema_avro.AvroSchema(User),
+    schema=pulsar.schema.schema_avro.AvroSchema(UserEnriched),
     subscription_name="my-pulsar-sub",
 )
 # Avro consumer
@@ -22,9 +26,11 @@ try:
     while True:
         msg = consumer.receive()
         print(msg.value())
+        consumer.acknowledge(msg)
 except KeyboardInterrupt:
     print("interrupted...")
-    client.close()
+
+client.close()
 
 # Plain text consumer
 # consumer = client.subscribe(topic_to_listen_to,
